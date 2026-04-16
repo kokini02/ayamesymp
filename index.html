@@ -96,6 +96,21 @@
         .blog-card h4 { margin: 10px 0; color: var(--primary); }
         .blog-card p { font-size: 0.95rem; color: #666; white-space: pre-wrap; }
 
+        /* 現在の募集状況（トップ用） */
+        .recruit-summary {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #eee;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .recruit-item { padding: 15px; border-left: 4px solid var(--accent); background: #fafafa; }
+        .recruit-item h4 { margin: 0; color: var(--primary); font-size: 1rem; }
+        .recruit-item p { margin: 5px 0 0; font-weight: bold; color: var(--accent); }
+
         /* Instagramセクション */
         .insta-section {
             background: #fff;
@@ -144,6 +159,9 @@
 <div class="hero">
     <div class="hero-slide is-active" style="background-image: url('https://via.placeholder.com/1920x1080/2c3e50/ffffff?text=Practice+Scene+1');"></div>
     <div class="hero-slide" style="background-image: url('https://via.placeholder.com/1920x1080/e67e22/ffffff?text=Practice+Scene+2');"></div>
+    <div class="hero-slide" style="background-image: url('https://via.placeholder.com/1920x1080/16a085/ffffff?text=Practice+Scene+3');"></div>
+    <div class="hero-slide" style="background-image: url('https://via.placeholder.com/1920x1080/8e44ad/ffffff?text=Practice+Scene+4');"></div>
+
     <div class="hero-content">
         <h1>彩シンフォニックバンド</h1>
         <p>Music brings color to your life.</p>
@@ -156,7 +174,7 @@
     <a href="parts.html">パート紹介</a>
     <a href="recruit.html">団員募集</a>
     <a href="#gallery">ギャラリー</a>
-    <a href="admin.html" style="color: var(--accent);">団員専用</a>
+    <a href="login.html" style="color: var(--accent);">団員専用</a>
 </nav>
 
 <div class="container">
@@ -180,6 +198,27 @@
         <div class="section-title"><h2>Activity Blog</h2></div>
         <div id="indexBlogList" class="blog-list">
             <p style="color:#888;">最新の記事を読み込み中...</p>
+        </div>
+    </section>
+
+    <section id="recruit-summary-section">
+        <div class="section-title"><h2>Now Recruiting!</h2></div>
+        <div class="recruit-summary">
+            <div class="recruit-item">
+                <h4>木管楽器</h4>
+                <p id="top-r-wood">確認中</p>
+            </div>
+            <div class="recruit-item">
+                <h4>金管楽器</h4>
+                <p id="top-r-brass">確認中</p>
+            </div>
+            <div class="recruit-item">
+                <h4>打楽器・低音</h4>
+                <p id="top-r-perc">確認中</p>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="recruit.html" style="color: var(--accent); font-weight: bold; text-decoration: none;">→ 詳しくはこちら</a>
         </div>
     </section>
 
@@ -253,7 +292,15 @@
             indexBlogArea.innerHTML = "<p style='color:#888;'>まだ投稿がありません。</p>";
         }
 
-        // --- 3. スライドショー ---
+        // --- 3. 募集状況の反映（NEW） ---
+        const rData = JSON.parse(localStorage.getItem("recruitData"));
+        if(rData){
+            document.getElementById("top-r-wood").innerText = rData.wood || "募集中";
+            document.getElementById("top-r-brass").innerText = rData.brass || "募集中";
+            document.getElementById("top-r-perc").innerText = rData.perc || "募集中";
+        }
+
+        // --- 4. スライドショー ---
         const slides = document.querySelectorAll('.hero-slide');
         let currentIdx = 0;
         setInterval(() => {
