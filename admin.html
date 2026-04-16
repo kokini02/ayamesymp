@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>管理画面 - 彩シンフォニックバンド</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#2c3e50; --accent:#e67e22; --bg:#f4f6f8; }
+        body { margin:0; font-family:'Noto Sans JP', sans-serif; background:var(--bg); }
+        .header { background:var(--primary); color:white; padding:20px; text-align:center; font-size:1.5rem; font-weight:bold; }
+        .container { max-width:1000px; margin:auto; padding:40px 20px; display:grid; gap:30px; }
+        .card { background:white; padding:30px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+        .card h2 { margin-top:0; color:var(--primary); border-left:5px solid var(--accent); padding-left:10px; }
+        label { display:block; margin-top:15px; font-weight:bold; font-size: 0.9rem; }
+        input, textarea, select { width:100%; padding:12px; margin-top:8px; border-radius:8px; border:1px solid #ddd; font-size: 1rem; }
+        button { margin-top:20px; width:100%; padding:15px; border:none; border-radius:30px; background:var(--primary); color:white; font-weight:bold; cursor:pointer; transition:0.3s; }
+        button:hover { transform:translateY(-3px); background:#1a252f; }
+        .delete-btn { background:#e74c3c; margin-top:10px; width: auto; padding: 5px 15px; }
+        .nav-links { text-align: center; margin-bottom: 20px; }
+        .nav-links a { margin: 0 10px; color: var(--primary); text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="header">彩シンフォニックバンド 管理画面</div>
+
+<div class="container">
+    <div class="nav-links">
+        <a href="index.html">トップ</a> | <a href="about.html">楽団紹介</a> | <a href="recruit.html">団員募集</a>
+    </div>
+
+    <div class="card">
+        <h2>🎵 次回の演奏会編集</h2>
+        <label>タイトル</label><input id="title">
+        <label>日付 (例: 2026.12.20 SUN)</label><input id="date">
+        <label>時間</label><input id="time">
+        <label>会場</label><input id="venue">
+        <label>料金</label><input id="price">
+        <label>曲目 (改行可)</label><textarea id="program" rows="4"></textarea>
+        <button onclick="saveConcert()">演奏会情報を保存</button>
+    </div>
+
+    <div class="card">
+        <h2>🏆 コンクール実績の追加</h2>
+        <label>年度</label><input id="awardYear" placeholder="2025年度">
+        <label>大会名</label><input id="awardName">
+        <label>結果 (金賞など)</label><input id="awardResult">
+        <button onclick="addAward()" style="background: #27ae60;">実績を追加</button>
+        <div id="awardList"></div>
+    </div>
+
+    <div class="card">
+        <h2>🎺 団員募集状況の更新</h2>
+        <label>木管楽器</label><input id="recruitWood">
+        <label>金管楽器</label><input id="recruitBrass">
+        <label>打楽器・低音</label><input id="recruitPerc">
+        <button onclick="saveRecruit()" style="background: var(--accent);">募集状況を保存</button>
+    </div>
+
+    <div class="card">
+        <h2>✏️ ブログ投稿</h2>
+        <label>タイトル</label><input id="blogTitle">
+        <label>日付</label><input id="blogDate">
+        <label>内容</label><textarea id="blogContent" rows="5"></textarea>
+        <button onclick="addBlog()">ブログを投稿</button>
+        <div id="blogList"></div>
+    </div>
+</div>
+
+<script>
+    // 演奏会保存
+    function saveConcert(){
+        const data = { title:title.value, date:date.value, time:time.value, venue:venue.value, price:price.value, program:program.value };
+        localStorage.setItem("concertData", JSON.stringify(data));
+        alert("演奏会情報を保存しました");
+    }
+
+    // 募集状況保存
+    function saveRecruit(){
+        const data = { wood:recruitWood.value, brass:recruitBrass.value, perc:recruitPerc.value };
+        localStorage.setItem("recruitData", JSON.stringify(data));
+        alert("募集状況を保存しました");
+    }
+
+    // コンクール実績
+    function addAward(){
+        const award = { year:awardYear.value, name:awardName.value, result:awardResult.value };
+        let awards = JSON.parse(localStorage.getItem("awards")) || [];
+        awards.unshift(award);
+        localStorage.setItem("awards", JSON.stringify(awards));
+        displayAwards();
+    }
+
+    function displayAwards(){
+        const area = document.getElementById("awardList");
+        area.innerHTML = "";
+        const awards = JSON.parse(localStorage.getItem("awards")) || [];
+        awards.forEach((a, i) => {
+            area.innerHTML += `<div>${a.year} ${a.name}: ${a.result} <button class="delete-btn" onclick="deleteAward(${i})">削除</button></div>`;
+        });
+    }
+
+    function deleteAward(i){
+        let awards = JSON.parse(localStorage.getItem("awards")) || [];
+        awards.splice(i,1);
+        localStorage.setItem("awards", JSON.stringify(awards));
+        displayAwards();
+    }
+
+    // ブログ (以前と同様)
+    function addBlog(){
+        const blog = { title:blogTitle.value, date:blogDate.value, content:blogContent.value };
+        let blogs = JSON.parse(localStorage.getItem("blogs")) || [];
+        blogs.unshift(blog);
+        localStorage.setItem("blogs", JSON.stringify(blogs));
+        displayBlogs();
+    }
+
+    function displayBlogs(){
+        const area = document.getElementById("blogList");
+        area.innerHTML = "";
+        const blogs = JSON.parse(localStorage.getItem("blogs")) || [];
+        blogs.forEach((b, i) => {
+            area.innerHTML += `<div class="blog-item"><strong>${b.title}</strong> (${b.date}) <button class="delete-btn" onclick="deleteBlog(${i})">削除</button></div>`;
+        });
+    }
+
+    function deleteBlog(i){
+        let blogs = JSON.parse(localStorage.getItem("blogs")) || [];
+        blogs.splice(i,1);
+        localStorage.setItem("blogs", JSON.stringify(blogs));
+        displayBlogs();
+    }
+
+    // 初期表示
+    window.onload = () => {
+        const c = JSON.parse(localStorage.getItem("concertData"));
+        if(c){ title.value=c.title; date.value=c.date; time.value=c.time; venue.value=c.venue; price.value=c.price; program.value=c.program; }
+        const r = JSON.parse(localStorage.getItem("recruitData"));
+        if(r){ recruitWood.value=r.wood; recruitBrass.value=r.brass; recruitPerc.value=r.perc; }
+        displayAwards();
+        displayBlogs();
+    };
+</script>
+</body>
+</html>
